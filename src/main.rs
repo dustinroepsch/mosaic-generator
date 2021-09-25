@@ -1,4 +1,5 @@
 use image::{GenericImageView, Rgba};
+use indicatif::ProgressBar;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -45,14 +46,18 @@ fn main() {
         })
         .collect();
 
+    let bar = ProgressBar::new((source_image.width() * source_image.height()) as u64);
+
     let output_image =
         image::ImageBuffer::from_fn(source_image.width(), source_image.height(), |x, y| {
+            bar.inc(1);
             nodes
                 .iter()
                 .min_by_key(|&n| n.distance_squared(x, y))
                 .unwrap()
                 .color
         });
+    bar.finish();
 
     output_image.save(opt.output).unwrap();
 }
