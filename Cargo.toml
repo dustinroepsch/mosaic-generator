@@ -12,3 +12,4 @@ lto = true
 image = "0.23"
 structopt = "0.3"
 indicatif = "0.16"
+rand = "0.8"
