@@ -7,11 +7,13 @@ edition = "2021"
 
 [profile.release]
 lto = true
+opt-level = 3
+overflow-checks = false
 
 [dependencies]
 image = "0.23"
-structopt = "0.3"
 indicatif = {version = "0.16", features = ["rayon"]}
+itertools = "0.10"
 rand = "0.8"
 rayon = "1.5"
-itertools = "0.10"
+structopt = "0.3"

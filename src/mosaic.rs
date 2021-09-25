@@ -69,6 +69,18 @@ impl Mosaic {
             })
             .collect();
 
-        image::ImageBuffer::from_fn(width, height, |x, y| colors[(x * height + y) as usize])
+        image::ImageBuffer::from_fn(width, height, |x, y| {
+            match (-1..=1)
+                .combinations(2)
+                .map(|d| (x as i64 + d[0], y as i64 + d[1]))
+                .map(|(x, y)| (x as u32 * height + y as u32) as usize)
+                .filter(|&idx| idx < (width * height) as usize)
+                .map(|idx| colors[idx])
+                .all_equal()
+            {
+                true => colors[(x as u32 * height + y as u32) as usize],
+                false => Rgba([0, 0, 0, 255]),
+            }
+        })
     }
 }
