@@ -23,6 +23,6 @@ fn main() {
     let source_image = image::open(opt.input).unwrap();
     let mosaic = Mosaic::new(opt.num_samples, source_image);
 
-    let output_image = mosaic.render(true);
+    let output_image = mosaic.render();
     output_image.save(opt.output).unwrap();
 }

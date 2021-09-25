@@ -1,6 +1,8 @@
 use image::{DynamicImage, GenericImageView, ImageBuffer, Rgba};
-use indicatif::ProgressBar;
+use indicatif::ParallelProgressIterator;
+use itertools::Itertools;
 use rand::{thread_rng, Rng};
+use rayon::prelude::*;
 
 struct Node {
     x: u32,
@@ -10,9 +12,10 @@ struct Node {
 
 impl Node {
     fn random(n: u32, source_image: &DynamicImage) -> Vec<Node> {
+        assert!(n != 0);
+
         let mut rnd = thread_rng();
 
-        assert!(n != 0);
         (0..n)
             .map(|_| {
                 let n_x = rnd.gen_range(0..source_image.width());
@@ -40,6 +43,7 @@ pub struct Mosaic {
 impl Mosaic {
     pub fn new(uniform_samples: u32, source: DynamicImage) -> Mosaic {
         assert!(uniform_samples != 0);
+
         Mosaic {
             uniform_nodes: Node::random(uniform_samples, &source),
             source_image: source,
@@ -47,33 +51,24 @@ impl Mosaic {
         }
     }
 
-    pub fn render(&self, display_progress: bool) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
-        let pb = match display_progress {
-            true => Some(ProgressBar::new(
-                (self.source_image.width() * self.source_image.height()) as u64,
-            )),
-            false => None,
-        };
+    pub fn render(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+        let width = self.source_image.width();
+        let height = self.source_image.height();
 
-        let img = image::ImageBuffer::from_fn(
-            self.source_image.width(),
-            self.source_image.height(),
-            |x, y| {
-                if let Some(pb) = &pb {
-                    pb.inc(1);
-                }
+        let coords: Vec<(u32, u32)> = (0..width).cartesian_product(0..height).collect();
+
+        let colors: Vec<Rgba<u8>> = coords
+            .par_iter()
+            .progress()
+            .map(|(x, y)| {
                 self.uniform_nodes
                     .iter()
-                    .min_by_key(|&n| n.distance_squared(x, y))
+                    .min_by_key(|&n| n.distance_squared(*x, *y))
                     .unwrap()
                     .color
-            },
-        );
+            })
+            .collect();
 
-        if let Some(pb) = &pb {
-            pb.finish();
-        }
-
-        img
+        image::ImageBuffer::from_fn(width, height, |x, y| colors[(x * height + y) as usize])
     }
 }
