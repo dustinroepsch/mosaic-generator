@@ -1,9 +1,11 @@
-use image::{DynamicImage, GenericImageView, ImageBuffer, Rgba};
+use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Rgba};
+use imageproc::edges::canny;
 use indicatif::ParallelProgressIterator;
 use itertools::Itertools;
-use rand::{thread_rng, Rng};
+use rand::{prelude::SliceRandom, thread_rng, Rng};
 use rayon::prelude::*;
 
+#[derive(Clone, Copy)]
 struct Node {
     x: u32,
     y: u32,
@@ -36,8 +38,7 @@ impl Node {
 
 pub struct Mosaic {
     source_image: DynamicImage,
-    uniform_nodes: Vec<Node>,
-    //    detail_nodes: Vec<Node>,
+    nodes: Vec<Node>,
 }
 
 impl Mosaic {
@@ -45,9 +46,30 @@ impl Mosaic {
         assert!(uniform_samples != 0);
 
         Mosaic {
-            uniform_nodes: Node::random(uniform_samples, &source),
+            nodes: Node::random(uniform_samples, &source),
             source_image: source,
-            //           detail_nodes: Vec::new(),
+        }
+    }
+
+    pub fn add_detail_nodes(&mut self, n: usize, low_threshold: f32, high_threshold: f32) {
+        let edges = canny(&self.source_image.to_luma8(), low_threshold, high_threshold);
+        edges.save("edges.png").unwrap();
+        println!("Updated edges.png");
+        let mut edge_nodes: Vec<Node> = Vec::new();
+        for col in 0..edges.width() {
+            for row in 0..edges.height() {
+                if let &Luma([255u8]) = edges.get_pixel(col, row) {
+                    edge_nodes.push(Node {
+                        x: col,
+                        y: row,
+                        color: self.source_image.get_pixel(col, row),
+                    });
+                }
+            }
+        }
+        let mut rng = thread_rng();
+        for edge in edge_nodes.choose_multiple(&mut rng, n) {
+            self.nodes.push(*edge);
         }
     }
 
@@ -61,7 +83,7 @@ impl Mosaic {
             .par_iter()
             .progress()
             .map(|(x, y)| {
-                self.uniform_nodes
+                self.nodes
                     .iter()
                     .min_by_key(|&n| n.distance_squared(*x, *y))
                     .unwrap()
