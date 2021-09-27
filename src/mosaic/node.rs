@@ -48,6 +48,25 @@ impl Node {
             .collect()
     }
 
+    /// Returns the squared distance between this node and the given point
+    ///
+    /// # Arguments
+    /// * `x` - The x coordinate
+    /// * `y` - The y coordinate
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use voronoi::mosaic::Node;
+    /// # use image::Rgba;
+    /// let node = Node {
+    ///     x: 0,
+    ///     y: 0,
+    ///     color: Rgba([0,0,0,0])
+    /// };
+    /// assert_eq!(node.distance_squared(3, 4), 25);
+    /// ```
+
     pub fn distance_squared(&self, x: u32, y: u32) -> i32 {
         let sx: i32 = self.x as i32;
         let sy: i32 = self.y as i32;
