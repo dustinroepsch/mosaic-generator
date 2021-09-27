@@ -24,8 +24,8 @@ impl Node {
     /// # Examples
     ///
     /// ```
-    /// use voronoi::mosaic::Node;
-    /// use image::DynamicImage;
+    /// # use voronoi::mosaic::Node;
+    /// # use image::DynamicImage;
     ///
     /// let img = DynamicImage::new_luma8(10, 10);
     /// let nodes = Node::random(10, &img);
