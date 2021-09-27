@@ -31,8 +31,12 @@ impl Node {
             .collect()
     }
 
-    fn distance_squared(&self, x: u32, y: u32) -> u32 {
-        (self.x - x) * (self.x - x) + (self.y - y) * (self.y - y)
+    fn distance_squared(&self, x: u32, y: u32) -> i32 {
+        let sx: i32 = self.x as i32;
+        let sy: i32 = self.y as i32;
+        let ox: i32 = x as i32;
+        let oy: i32 = y as i32;
+        (sx - ox) * (sx - ox) + (sy - oy) * (sy - oy)
     }
 }
 
