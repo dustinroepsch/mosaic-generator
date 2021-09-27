@@ -27,7 +27,7 @@ struct Opt {
     #[structopt(long, default_value = "0.15")]
     high_threshold: f32,
 
-    /// draw a black outline between tiles
+    /// don't draw a black outline between tiles
     #[structopt(long)]
     no_draw_outline: bool,
 }
