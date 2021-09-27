@@ -23,8 +23,13 @@ struct Opt {
 
     #[structopt(short, default_value = "0.13")]
     low_threshold: f32,
+
     #[structopt(short, default_value = "0.15")]
     high_threshold: f32,
+
+    /// draw a black outline between tiles
+    #[structopt(long)]
+    draw_outline: bool,
 }
 
 fn main() {
@@ -34,6 +39,6 @@ fn main() {
 
     mosaic.add_detail_nodes(opt.num_edge_samples, opt.low_threshold, opt.high_threshold);
 
-    let output_image = mosaic.render();
+    let output_image = mosaic.render(opt.draw_outline);
     output_image.save(opt.output).unwrap();
 }

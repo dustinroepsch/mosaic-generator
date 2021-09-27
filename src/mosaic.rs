@@ -77,7 +77,7 @@ impl Mosaic {
         }
     }
 
-    pub fn render(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+    pub fn render(&self, should_draw_outline: bool) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
         let width = self.source_image.width();
         let height = self.source_image.height();
 
@@ -96,16 +96,22 @@ impl Mosaic {
             .collect();
 
         image::ImageBuffer::from_fn(width, height, |x, y| {
-            match (-1..=1)
-                .combinations(2)
-                .map(|d| (x as i64 + d[0], y as i64 + d[1]))
-                .map(|(x, y)| (x as u32 * height + y as u32) as usize)
-                .filter(|&idx| idx < (width * height) as usize)
-                .map(|idx| colors[idx])
-                .all_equal()
-            {
-                true => colors[(x as u32 * height + y as u32) as usize],
-                false => Rgba([0, 0, 0, 255]),
+            let original_color = colors[(x as u32 * height + y as u32) as usize];
+            let black = Rgba([0, 0, 0, 255]);
+            if should_draw_outline {
+                match (-1..=1)
+                    .combinations(2)
+                    .map(|d| (x as i64 + d[0], y as i64 + d[1]))
+                    .map(|(x, y)| (x as u32 * height + y as u32) as usize)
+                    .filter(|&idx| idx < (width * height) as usize)
+                    .map(|idx| colors[idx])
+                    .all_equal()
+                {
+                    true => original_color,
+                    false => black,
+                }
+            } else {
+                original_color
             }
         })
     }
