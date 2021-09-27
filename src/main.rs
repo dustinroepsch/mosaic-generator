@@ -1,7 +1,6 @@
-mod mosaic;
-use crate::mosaic::Mosaic;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use voronoi::mosaic::Mosaic;
 
 #[derive(StructOpt)]
 #[structopt(name = "voronoi", about = "make voronoi")]

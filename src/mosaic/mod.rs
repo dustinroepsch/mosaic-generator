@@ -1,44 +1,13 @@
+mod node;
+
+pub use crate::mosaic::node::Node;
 use image::{DynamicImage, GenericImageView, ImageBuffer, Luma, Rgba};
 use imageproc::edges::canny;
 use indicatif::ParallelProgressIterator;
 use itertools::Itertools;
-use rand::{prelude::SliceRandom, thread_rng, Rng};
+use rand::prelude::*;
+use rand::thread_rng;
 use rayon::prelude::*;
-
-#[derive(Clone, Copy)]
-struct Node {
-    x: u32,
-    y: u32,
-    color: Rgba<u8>,
-}
-
-impl Node {
-    fn random(n: u32, source_image: &DynamicImage) -> Vec<Node> {
-        assert!(n != 0);
-
-        let mut rnd = thread_rng();
-
-        (0..n)
-            .map(|_| {
-                let n_x = rnd.gen_range(0..source_image.width());
-                let n_y = rnd.gen_range(0..source_image.height());
-                Node {
-                    x: n_x,
-                    y: n_y,
-                    color: source_image.get_pixel(n_x, n_y),
-                }
-            })
-            .collect()
-    }
-
-    fn distance_squared(&self, x: u32, y: u32) -> i32 {
-        let sx: i32 = self.x as i32;
-        let sy: i32 = self.y as i32;
-        let ox: i32 = x as i32;
-        let oy: i32 = y as i32;
-        (sx - ox) * (sx - ox) + (sy - oy) * (sy - oy)
-    }
-}
 
 pub struct Mosaic {
     source_image: DynamicImage,
