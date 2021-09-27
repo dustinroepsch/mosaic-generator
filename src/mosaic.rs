@@ -58,7 +58,7 @@ impl Mosaic {
         let mut edge_nodes: Vec<Node> = Vec::new();
         for col in 0..edges.width() {
             for row in 0..edges.height() {
-                if let &Luma([255u8]) = edges.get_pixel(col, row) {
+                if let Luma([255u8]) = *edges.get_pixel(col, row) {
                     edge_nodes.push(Node {
                         x: col,
                         y: row,
