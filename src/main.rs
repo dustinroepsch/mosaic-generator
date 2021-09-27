@@ -29,7 +29,7 @@ struct Opt {
 
     /// draw a black outline between tiles
     #[structopt(long)]
-    draw_outline: bool,
+    no_draw_outline: bool,
 }
 
 fn main() {
@@ -39,6 +39,6 @@ fn main() {
 
     mosaic.add_detail_nodes(opt.num_edge_samples, opt.low_threshold, opt.high_threshold);
 
-    let output_image = mosaic.render(opt.draw_outline);
+    let output_image = mosaic.render(!opt.no_draw_outline);
     output_image.save(opt.output).unwrap();
 }
