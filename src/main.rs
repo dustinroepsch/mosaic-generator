@@ -10,7 +10,7 @@ struct Opt {
     input: PathBuf,
 
     /// The destination of the output image
-    #[structopt(short, default_value = "out.png")]
+    #[structopt(short, long, default_value = "out.png")]
     output: PathBuf,
 
     /// The number of random samples to make
@@ -21,10 +21,10 @@ struct Opt {
     #[structopt(long, default_value = "100")]
     num_edge_samples: usize,
 
-    #[structopt(short, default_value = "0.13")]
+    #[structopt(long, default_value = "0.13")]
     low_threshold: f32,
 
-    #[structopt(short, default_value = "0.15")]
+    #[structopt(long, default_value = "0.15")]
     high_threshold: f32,
 
     /// draw a black outline between tiles
